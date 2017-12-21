@@ -14,6 +14,11 @@ class Stub {
     this.obj[this.methodName] = this.originalMethod
     return this
   }
+
+  resolves (value) {
+    this.obj[this.methodName] = () => Promise.resolve(value)
+    return this
+  }
 }
 
 export const stub = (obj, methodName) => {

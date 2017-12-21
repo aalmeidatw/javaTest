@@ -1,26 +1,44 @@
 import { expect } from 'chai'
 import { stub } from '../src/better_sinon'
-import File from '../src/file'
+import * as sinon from 'sinon'
 
-describe('file', () => {
+describe('Stub', () => {
 
-  let file = new File()
-  let fileStub
+  class Bomb {
+    explode() {
+      throw new Error('stub this!')
+    }
 
-  beforeEach(() => {
-    fileStub = stub(file, 'methodOne')
+    fetchStatus() {
+      return Promise.resolve('bomb status')
+    }
+  }
+
+  describe('resolves', () => {
+
+    it('returns a promise which resolves to the provided value', () => {
+      const bomb = new Bomb()
+      stub(bomb, 'fetchStatus').resolves('banana')
+
+      return bomb.fetchStatus().then((value) => {
+        expect(value).to.equal('banana')
+      })
+    })
   })
 
-  afterEach(() => {
-    fileStub.restore()
+  describe('returns', () => {
+
+    it('does not throw when explode is stubbed', () => {
+      const bomb = new Bomb()
+      stub(bomb, 'explode').returns(2)
+      expect(bomb.explode()).to.equal(2)
+    })
+
+    it('throws exception when explode is not stubbed', () => {
+      const bomb = new Bomb()
+      expect(bomb.explode).to.throw('stub this!')
+    })
   })
 
-  it('does not throw error', () => {
-    fileStub.returns(2)
-    expect(file.methodOne()).to.equal(2)
-  })
-
-  it('throws exception', () => {
-    expect(file.methodOne).to.throw('stub this!')
-  })
+  //TODO: test restore
 })
